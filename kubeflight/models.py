@@ -1,3 +1,5 @@
+# Copyright 2026 Zyvor AI Labs · https://zyvor.dev
+# SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 from dataclasses import dataclass, asdict, field
 from typing import Any

@@ -1,3 +1,5 @@
+# Copyright 2026 Zyvor AI Labs · https://zyvor.dev
+# SPDX-License-Identifier: Apache-2.0
 .PHONY: install test check smoke serve report package deploy-remote smoke-remote
 install:
 	python -m pip install -e .

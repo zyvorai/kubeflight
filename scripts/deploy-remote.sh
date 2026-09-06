@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-# Copyright 2026 Zyvor AI Labs
+# Copyright 2026 Zyvor AI Labs · https://zyvor.dev
 # SPDX-License-Identifier: Apache-2.0
 # ============================================================================
 # deploy-remote.sh — Deploy KubeFlight to a remote host as a systemd service
-# ============================================================================
 # KubeFlight is a Python app (FastAPI + uvicorn). Deployment:
 #   1. Detect remote Python (>=3.11) over SSH
 #   2. Ship source tarball (no local build required)
@@ -35,7 +34,6 @@
 # Environment variables:
 #   DEPLOY_HOST, DEPLOY_USER, DEPLOY_PASS   — same as the positional args
 #   KUBEFLIGHT_PORT                          — listen/health-check port
-# ============================================================================
 
 set -euo pipefail
 

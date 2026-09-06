@@ -1,3 +1,5 @@
+# Copyright 2026 Zyvor AI Labs · https://zyvor.dev
+# SPDX-License-Identifier: Apache-2.0
 from kubeflight.quantities import cpu_millicores,memory_bytes,gib
 
 def test_quantities():

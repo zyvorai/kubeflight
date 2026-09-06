@@ -1,3 +1,5 @@
+# Copyright 2026 Zyvor AI Labs · https://zyvor.dev
+# SPDX-License-Identifier: Apache-2.0
 from __future__ import annotations
 import asyncio,hmac,json,os,time
 from collections import defaultdict,deque

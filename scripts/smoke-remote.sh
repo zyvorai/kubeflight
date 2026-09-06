@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-# Copyright 2026 Zyvor AI Labs
+# Copyright 2026 Zyvor AI Labs · https://zyvor.dev
 # SPDX-License-Identifier: Apache-2.0
 # ============================================================================
 # smoke-remote.sh — Verify a running KubeFlight instance (local or remote)
-# ============================================================================
 # Checks healthz, dashboard HTML, demo API, and a /api/check round-trip.
 #
 # Usage:
