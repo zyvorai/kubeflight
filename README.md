@@ -84,11 +84,18 @@ The browser sends manifests to the KubeFlight instance you opened. KubeFlight it
 Cross-ships source and installs KubeFlight as a systemd service over SSH (same pattern as Kairo/Scout):
 
 ```bash
-# Default port 8080, or set KUBEFLIGHT_PORT
+# Explicit port (CLI flag)
+./scripts/deploy-remote.sh 212.8.248.187 sus --port 27754
+
+# Or via env
 KUBEFLIGHT_PORT=27754 ./scripts/deploy-remote.sh 212.8.248.187 sus
 
-# Smoke an existing instance
+# Omit port → reuse .deploy-last PORT, else pick random 18000–28999
+./scripts/deploy-remote.sh 212.8.248.187 sus
+
+# Smoke (URL, --port, env, or .deploy-last)
 KUBEFLIGHT_URL=http://212.8.248.187:27754 ./scripts/smoke-remote.sh
+./scripts/smoke-remote.sh --port 27754
 
 # Remove
 ./scripts/deploy-remote.sh 212.8.248.187 sus --uninstall
