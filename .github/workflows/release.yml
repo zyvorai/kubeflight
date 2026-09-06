@@ -47,7 +47,7 @@ jobs:
           ghcr.io/${{ github.repository }}:latest
     - uses: anchore/sbom-action@v0
       with: {image: "ghcr.io/${{ github.repository }}:${{ github.ref_name }}", output-file: kubeflight-image.spdx.json}
-    - uses: actions/attest-build-provenance@v2
+    - uses: actions/attest-build-provenance@v4
       with: {subject-name: "ghcr.io/${{ github.repository }}", subject-digest: "${{ steps.build.outputs.digest }}", push-to-registry: true}
     - uses: actions/upload-artifact@v7
       with: {name: image-sbom, path: kubeflight-image.spdx.json}
