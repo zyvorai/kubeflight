@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v7
       with: {python-version: "${{ matrix.python }}", cache: pip}
     - run: pip install -r requirements-dev.txt
     - run: python -m compileall -q kubeflight tests
@@ -29,7 +29,7 @@ jobs:
     - run: helm lint charts/kubeflight
     - run: helm template test charts/kubeflight > /tmp/rendered.yaml
     - run: kubectl kustomize deploy/kubernetes > /tmp/kustomized.yaml
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v7
       with: {python-version: "3.13"}
     - run: pip install -r requirements-dev.txt
     - run: PYTHONPATH=. python scripts/validate_deployment.py
