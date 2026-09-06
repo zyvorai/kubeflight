@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubeflight
+  namespace: kubeflight
+  labels: {app.kubernetes.io/name: kubeflight, app.kubernetes.io/version: "0.2.0"}
+spec:
+  replicas: 2
+  selector: {matchLabels: {app.kubernetes.io/name: kubeflight}}
+  strategy: {type: RollingUpdate, rollingUpdate: {maxUnavailable: 0, maxSurge: 1}}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: kubeflight}
+    spec:
+      serviceAccountName: kubeflight
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+      - name: kubeflight
+        image: ghcr.io/zyvorai/kubeflight:v0.2.0
+        imagePullPolicy: IfNotPresent
+        args: ["serve","--host","0.0.0.0","--port","8080"]
+        ports: [{name: http, containerPort: 8080, protocol: TCP}]
+        env:
+        - {name: KUBEFLIGHT_LIVE_CLUSTER, value: "false"}
+        - {name: KUBEFLIGHT_MAX_BODY_BYTES, value: "4194304"}
+        - {name: KUBEFLIGHT_MAX_CONCURRENT, value: "8"}
+        - {name: KUBEFLIGHT_RATE_PER_MINUTE, value: "60"}
+        - {name: KUBEFLIGHT_COST_CPU_MONTH, value: "14.60"}
+        - {name: KUBEFLIGHT_COST_GIB_MONTH, value: "1.90"}
+        - {name: KUBEFLIGHT_COST_GIB_STORAGE_MONTH, value: "0.08"}
+        - {name: KUBEFLIGHT_COST_GPU_MONTH, value: "510"}
+        readinessProbe: {httpGet: {path: /api/readyz, port: http}, initialDelaySeconds: 2, periodSeconds: 5}
+        livenessProbe: {httpGet: {path: /api/healthz, port: http}, initialDelaySeconds: 5, periodSeconds: 10}
+        resources:
+          requests: {cpu: 100m, memory: 128Mi}
+          limits: {cpu: "1", memory: 512Mi}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities: {drop: ["ALL"]}
+          runAsNonRoot: true
+          runAsUser: 10001
+      topologySpreadConstraints:
+      - maxSkew: 1
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector: {matchLabels: {app.kubernetes.io/name: kubeflight}}

@@ -1,0 +1,25 @@
+[Unit]
+Description=KubeFlight Kubernetes preflight simulator
+Documentation=https://github.com/zyvorai/kubeflight
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/kubeflight
+EnvironmentFile=-/etc/kubeflight/kubeflight.env
+ExecStart=/opt/kubeflight/.venv/bin/kubeflight serve --host 0.0.0.0 --port ${KUBEFLIGHT_PORT}
+Restart=on-failure
+RestartSec=5s
+User=kubeflight
+Group=kubeflight
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/kubeflight
+ReadOnlyPaths=/etc/kubeflight
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kubeflight
+
+[Install]
+WantedBy=multi-user.target

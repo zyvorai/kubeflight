@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kubeflight
+  namespace: kubeflight
+  labels: {app.kubernetes.io/name: kubeflight}
+automountServiceAccountToken: false

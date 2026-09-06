@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: kubeflight, namespace: kubeflight}
+spec:
+  template:
+    spec:
+      automountServiceAccountToken: true
+      containers:
+      - name: kubeflight
+        env:
+        - {name: KUBEFLIGHT_LIVE_CLUSTER, value: "true"}
+        - name: KUBEFLIGHT_API_TOKEN
+          valueFrom: {secretKeyRef: {name: kubeflight-api, key: token}}

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kubeflight.fullname" . }}
+  labels:
+    {{- include "kubeflight.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  selector: {app.kubernetes.io/name: {{ include "kubeflight.name" . }}, app.kubernetes.io/instance: {{ .Release.Name }}}
+  ports: [{name: http, port: {{ .Values.service.port }}, targetPort: http}]

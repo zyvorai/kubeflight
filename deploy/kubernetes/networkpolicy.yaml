@@ -1,0 +1,9 @@
+# Optional. Not included by default because ingress topology differs by platform.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: {name: kubeflight, namespace: kubeflight}
+spec:
+  podSelector: {matchLabels: {app.kubernetes.io/name: kubeflight}}
+  policyTypes: [Ingress]
+  ingress:
+  - ports: [{port: 8080, protocol: TCP}]

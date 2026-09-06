@@ -1,0 +1,60 @@
+name: CI
+on:
+  push: {branches: [main]}
+  pull_request:
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  test:
+    strategy: {matrix: {python: ["3.11", "3.12", "3.13"]}}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with: {python-version: "${{ matrix.python }}", cache: pip}
+    - run: pip install -r requirements-dev.txt
+    - run: python -m compileall -q kubeflight tests
+    - run: pytest -q
+    - run: python -m kubeflight.cli check examples/demo/app.yaml --baseline examples/demo/baseline.yaml --cluster-snapshot examples/demo/cluster-snapshot.json --format sarif --output kubeflight.sarif --fail-on never
+    - if: matrix.python == '3.13'
+      uses: github/codeql-action/upload-sarif@v3
+      with: {sarif_file: kubeflight.sarif}
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: azure/setup-helm@v4
+    - uses: azure/setup-kubectl@v4
+    - run: helm lint charts/kubeflight
+    - run: helm template test charts/kubeflight > /tmp/rendered.yaml
+    - run: kubectl kustomize deploy/kubernetes > /tmp/kustomized.yaml
+    - uses: actions/setup-python@v5
+      with: {python-version: "3.13"}
+    - run: pip install -r requirements-dev.txt
+    - run: PYTHONPATH=. python scripts/validate_deployment.py
+  container:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: docker/setup-buildx-action@v3
+    - uses: docker/build-push-action@v6
+      with: {context: ., push: false, tags: kubeflight:test}
+  kind-e2e:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: helm/kind-action@v1
+    - run: docker build -t kubeflight:e2e .
+    - run: kind load docker-image kubeflight:e2e
+    - run: |
+        sed 's#ghcr.io/zyvorai/kubeflight:v0.2.0#kubeflight:e2e#' deploy/kubernetes/deployment.yaml > /tmp/deployment.yaml
+        kubectl apply -f deploy/kubernetes/namespace.yaml
+        kubectl apply -f deploy/kubernetes/rbac.yaml
+        kubectl apply -f /tmp/deployment.yaml
+        kubectl apply -f deploy/kubernetes/service.yaml
+        kubectl apply -f deploy/kubernetes/pdb.yaml
+        kubectl -n kubeflight rollout status deploy/kubeflight --timeout=120s
+        kubectl -n kubeflight port-forward svc/kubeflight 18080:80 >/tmp/pf.log 2>&1 &
+        sleep 3
+        curl -fsS http://127.0.0.1:18080/api/healthz | grep -q '"status":"ok"'

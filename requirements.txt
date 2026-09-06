@@ -1,0 +1,3 @@
+fastapi==0.128.2
+uvicorn==0.48.0
+PyYAML==6.0.3

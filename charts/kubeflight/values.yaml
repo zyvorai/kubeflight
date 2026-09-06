@@ -1,0 +1,48 @@
+replicaCount: 2
+image:
+  repository: ghcr.io/zyvorai/kubeflight
+  tag: v0.2.0
+  pullPolicy: IfNotPresent
+service:
+  type: ClusterIP
+  port: 80
+resources:
+  requests: {cpu: 100m, memory: 128Mi}
+  limits: {cpu: "1", memory: 512Mi}
+serviceAccount:
+  create: true
+  name: ""
+liveCluster:
+  enabled: false
+  # Required when enabled. Prefer an existing Secret instead of storing a token in values.
+  existingSecret: ""
+  secretKey: token
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile: {type: RuntimeDefault}
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 10001
+  capabilities: {drop: [ALL]}
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+networkPolicy:
+  enabled: false
+costModel:
+  cpuMonth: "14.60"
+  gibMonth: "1.90"
+  storageGibMonth: "0.08"
+  gpuMonth: "510"
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+  - host: kubeflight.example.com
+    paths:
+    - path: /
+      pathType: Prefix
+  tls: []

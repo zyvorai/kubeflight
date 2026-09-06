@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kubeflight.fullname" . }}
+  labels:
+    {{- include "kubeflight.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy: {type: RollingUpdate, rollingUpdate: {maxUnavailable: 0, maxSurge: 1}}
+  selector:
+    matchLabels: {app.kubernetes.io/name: {{ include "kubeflight.name" . }}, app.kubernetes.io/instance: {{ .Release.Name }}}
+  template:
+    metadata:
+      labels: {app.kubernetes.io/name: {{ include "kubeflight.name" . }}, app.kubernetes.io/instance: {{ .Release.Name }}}
+    spec:
+      serviceAccountName: {{ include "kubeflight.sa" . }}
+      automountServiceAccountToken: {{ .Values.liveCluster.enabled }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: kubeflight
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args: ["serve","--host","0.0.0.0","--port","8080"]
+        ports: [{name: http, containerPort: 8080}]
+        env:
+        - {name: KUBEFLIGHT_LIVE_CLUSTER, value: {{ .Values.liveCluster.enabled | quote }}}
+        {{- if .Values.liveCluster.enabled }}
+        {{- if not .Values.liveCluster.existingSecret }}
+        {{- fail "liveCluster.enabled=true requires liveCluster.existingSecret" }}
+        {{- end }}
+        - name: KUBEFLIGHT_API_TOKEN
+          valueFrom: {secretKeyRef: {name: {{ .Values.liveCluster.existingSecret | quote }}, key: {{ .Values.liveCluster.secretKey | quote }}}}
+        {{- end }}
+        - {name: KUBEFLIGHT_COST_CPU_MONTH, value: {{ .Values.costModel.cpuMonth | quote }}}
+        - {name: KUBEFLIGHT_COST_GIB_MONTH, value: {{ .Values.costModel.gibMonth | quote }}}
+        - {name: KUBEFLIGHT_COST_GIB_STORAGE_MONTH, value: {{ .Values.costModel.storageGibMonth | quote }}}
+        - {name: KUBEFLIGHT_COST_GPU_MONTH, value: {{ .Values.costModel.gpuMonth | quote }}}
+        readinessProbe: {httpGet: {path: /api/readyz, port: http}, initialDelaySeconds: 2, periodSeconds: 5}
+        livenessProbe: {httpGet: {path: /api/healthz, port: http}, initialDelaySeconds: 5, periodSeconds: 10}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.containerSecurityContext | nindent 10 }}

@@ -1,0 +1,21 @@
+{{- if .Values.liveCluster.enabled }}
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata: {name: {{ include "kubeflight.fullname" . }}-readonly}
+rules:
+- apiGroups: [""]
+  resources: ["nodes","namespaces","pods","serviceaccounts"]
+  verbs: ["get","list"]
+- apiGroups: ["storage.k8s.io"]
+  resources: ["storageclasses"]
+  verbs: ["get","list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: {name: {{ include "kubeflight.fullname" . }}-readonly}
+roleRef: {apiGroup: rbac.authorization.k8s.io, kind: ClusterRole, name: {{ include "kubeflight.fullname" . }}-readonly}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "kubeflight.sa" . }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}

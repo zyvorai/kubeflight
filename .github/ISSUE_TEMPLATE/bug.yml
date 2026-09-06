@@ -1,0 +1,14 @@
+name: Bug report
+description: Report a reproducible KubeFlight problem
+body:
+- type: textarea
+  attributes: {label: What happened?}
+  validations: {required: true}
+- type: textarea
+  attributes: {label: Reproduction, description: Include sanitized manifests and command output where possible.}
+  validations: {required: true}
+- type: input
+  attributes: {label: KubeFlight version}
+  validations: {required: true}
+- type: input
+  attributes: {label: Kubernetes version}

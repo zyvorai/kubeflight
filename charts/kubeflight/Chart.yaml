@@ -1,0 +1,11 @@
+apiVersion: v2
+name: kubeflight
+description: Deterministic Kubernetes deployment preflight intelligence
+type: application
+version: 0.2.0
+appVersion: "0.2.0"
+home: https://github.com/zyvorai/kubeflight
+sources: [https://github.com/zyvorai/kubeflight]
+maintainers:
+- name: Zyvor AI Labs
+  url: https://zyvor.dev

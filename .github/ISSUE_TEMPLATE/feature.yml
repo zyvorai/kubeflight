@@ -1,0 +1,8 @@
+name: Feature request
+description: Propose a deterministic preflight check or integration
+body:
+- type: textarea
+  attributes: {label: Problem, description: What deployment risk should KubeFlight catch?}
+  validations: {required: true}
+- type: textarea
+  attributes: {label: Proposed check and evidence}

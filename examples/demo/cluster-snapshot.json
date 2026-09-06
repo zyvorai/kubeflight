@@ -1,0 +1,5 @@
+{"nodes":[
+ {"metadata":{"name":"worker-a","labels":{"kubernetes.io/arch":"amd64"}},"status":{"allocatable":{"cpu":"4","memory":"8Gi","pods":"110"}},"spec":{}},
+ {"metadata":{"name":"worker-b","labels":{"kubernetes.io/arch":"amd64"}},"status":{"allocatable":{"cpu":"2","memory":"1500Mi","pods":"110"}},"spec":{}},
+ {"metadata":{"name":"worker-c","labels":{"kubernetes.io/arch":"amd64"}},"status":{"allocatable":{"cpu":"8","memory":"16Gi","pods":"110"}},"spec":{}}
+],"namespaces":[{"metadata":{"name":"shop"}}],"storageclasses":[]}

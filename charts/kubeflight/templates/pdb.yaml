@@ -1,0 +1,9 @@
+{{- if .Values.podDisruptionBudget.enabled }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata: {name: {{ include "kubeflight.fullname" . }}}
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels: {app.kubernetes.io/name: {{ include "kubeflight.name" . }}, app.kubernetes.io/instance: {{ .Release.Name }}}
+{{- end }}
