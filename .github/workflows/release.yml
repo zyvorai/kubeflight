@@ -10,7 +10,7 @@ jobs:
   python-artifacts:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - uses: actions/setup-python@v7
       with: {python-version: "3.13"}
     - run: pip install build
@@ -21,7 +21,7 @@ jobs:
     strategy: {matrix: {os: [ubuntu-latest, macos-latest, windows-latest]}}
     runs-on: "${{ matrix.os }}"
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - uses: actions/setup-python@v7
       with: {python-version: "3.13"}
     - run: pip install . pyinstaller
@@ -31,7 +31,7 @@ jobs:
   image:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - uses: docker/setup-qemu-action@v3
     - uses: docker/setup-buildx-action@v4
     - uses: docker/login-action@v3
@@ -55,7 +55,7 @@ jobs:
     needs: [python-artifacts, standalone, image]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v7
     - uses: actions/download-artifact@v4
       with: {path: release-assets, merge-multiple: true}
     - run: tar -czf kubeflight-${{ github.ref_name }}-chart.tgz -C charts kubeflight
