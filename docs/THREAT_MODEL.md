@@ -1,4 +1,8 @@
-# Threat model
+---
+hero:
+  eyebrow: THREAT MODEL
+  title: Threat model
+---
 
 ## Assets
 - Kubernetes manifests and configuration values submitted for analysis

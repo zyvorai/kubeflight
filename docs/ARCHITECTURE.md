@@ -1,4 +1,12 @@
-# Architecture
+---
+hero:
+  eyebrow: ARCHITECTURE
+  title: Architecture
+  lead: "A deterministic preflight pipeline: parse and render manifests, check structure and security, simulate scheduler placement, diff change impact, estimate cost, and score — with no LLM in the decision path."
+  highlights:
+    - {value: "9", label: "pipeline stages, from input to reports"}
+    - {value: "4", label: "trust boundaries — offline CLI, dashboard/API, live cluster, server dry-run"}
+---
 
 KubeFlight is a deterministic preflight pipeline:
 
@@ -6,10 +14,12 @@ KubeFlight is a deterministic preflight pipeline:
 
 ## Trust boundaries
 
-- **Offline CLI:** no cluster or network access is required.
-- **Dashboard/API:** browser data is sent only to the KubeFlight server being used.
-- **Live cluster mode:** disabled by default; requires an explicit service-account token and API bearer token.
-- **Server dry-run:** optional and authoritative for API-server schema/admission behavior that static analysis cannot model.
+<div class="compare-cards" markdown="1">
+- **Offline CLI** — No cluster or network access is required.
+- **Dashboard/API** — Browser data is sent only to the KubeFlight server being used.
+- **Live cluster mode** — Disabled by default; requires an explicit service-account token and API bearer token.
+- **Server dry-run** — Optional and authoritative for API-server schema/admission behavior that static analysis cannot model.
+</div>
 
 ## Scheduling model
 

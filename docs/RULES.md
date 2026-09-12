@@ -1,4 +1,8 @@
-# Rules
+---
+hero:
+  eyebrow: RULES
+  title: Rules
+---
 
 Findings use five severities: `critical`, `high`, `medium`, `low`, `info`.
 

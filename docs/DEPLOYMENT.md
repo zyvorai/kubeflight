@@ -1,4 +1,8 @@
-# Deployment
+---
+hero:
+  eyebrow: DEPLOYMENT
+  title: Deployment
+---
 
 ## Recommended default
 
