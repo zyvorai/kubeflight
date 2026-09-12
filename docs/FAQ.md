@@ -7,7 +7,7 @@ decided to adopt it.
 
 **Is it really free?** Yes. Apache-2.0 — use, modify, and run it for
 personal, lab, and commercial production use at no charge, subject to
-preserving notices. See the README's [License](../README.md#license)
+preserving notices. See the README's [License](https://github.com/zyvorai/kubeflight#license)
 section.
 
 **What does "Enterprise" mean here?** Production support, SLAs, and
@@ -19,7 +19,7 @@ sales@zyvor.dev. Nothing in this repository requires it.
 **What if I find a bug?** Open a GitHub issue.
 
 **What if I find a security vulnerability?** Do not open a public issue —
-see [`SECURITY.md`](../SECURITY.md) for private reporting to the Zyvor
+see [`SECURITY.md`](https://github.com/zyvorai/kubeflight/blob/main/SECURITY.md) for private reporting to the Zyvor
 security contact, and [`docs/THREAT_MODEL.md`](THREAT_MODEL.md) for the
 documented asset/trust model.
 
@@ -54,7 +54,7 @@ SARIF). See [`docs/RULES.md`](RULES.md) for the five severities
 **Does it need a live cluster?** No — the default mode is fully offline
 against a JSON cluster snapshot. Live, read-only cluster reads are opt-in
 (see [`docs/DEPLOYMENT.md`](DEPLOYMENT.md)) and, per
-[`SECURITY.md`](../SECURITY.md), "KubeFlight's bundled service
+[`SECURITY.md`](https://github.com/zyvorai/kubeflight/blob/main/SECURITY.md), "KubeFlight's bundled service
 account never requires Secret read access."
 
 ## Integration
