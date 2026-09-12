@@ -12,6 +12,36 @@ KubeFlight is an Apache-2.0, local-first Kubernetes deployment simulator and pre
 
 A valid manifest can still fail in production because of node capacity, existing Pods, taints, affinity, NetworkPolicy, missing RBAC, removed APIs, cost growth, availability constraints, or downstream dependencies. KubeFlight puts those signals into one repeatable preflight.
 
+## Is this for you?
+
+KubeFlight is a small, open-source (Apache-2.0), local-first, deterministic
+preflight simulator — it's not a cost-monitoring dashboard, not a
+general-purpose policy engine, and not an AI-assisted deployment advisor.
+
+| | **KubeFlight** | Datree / Fairwinds Insights | Polaris / kube-score | OPA/Conftest, Kyverno | k8sgpt | `kubectl diff --dry-run=server` |
+|---|---|---|---|---|---|---|
+| Primary scope | Preflight simulation: placement, RBAC, NetworkPolicy, cost delta, evidence-backed decision | Policy/config scanning + fleet dashboard (some proprietary) | Static manifest best-practice linting | Generic policy-as-code enforcement | LLM-based cluster diagnosis | Server-side dry-run diff only, no scoring |
+| Decision method | Deterministic — "does not use an LLM to decide whether a deployment is safe" | Deterministic rules | Deterministic rules | Deterministic rules you author | LLM-based (probabilistic) | N/A (raw diff) |
+| Placement/scheduling simulation | Yes, against an offline or live cluster snapshot | No | No | No | No | No |
+| Cost estimation | Yes (provider-neutral) | Some (Fairwinds/Kubecost-adjacent tools) | No | No | No | No |
+| License | Apache-2.0 | Mixed open-core/proprietary | Apache-2.0 | Apache-2.0 | Apache-2.0 |  N/A (built into kubectl) |
+
+*(General characterizations as of writing — verify current features against
+each project's own docs.)*
+
+**Maturity, stated honestly**: current version is 0.2.0
+(`CHANGELOG.md`). The tool's own README caveat: "KubeFlight is a
+**preflight simulator**, not a byte-for-byte implementation of
+kube-scheduler plugins, admission webhooks, CNI dataplanes, or production
+traffic. Unknown facts are reported conservatively rather than invented."
+For an authoritative check beyond simulation, it explicitly defers to
+`kubectl apply --dry-run=server` as an opt-in feature requiring a real
+cluster.
+
+New here? [`docs/FAQ.md`](docs/FAQ.md) covers licensing, support, and
+production-readiness questions; [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md)
+covers real operational issues with their documented fix.
+
 ## v0.2.0 capabilities
 
 | Area | Checks |
@@ -292,6 +322,11 @@ kubeflight/
 ## Security
 
 See [SECURITY.md](SECURITY.md) and [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md).
+
+## FAQ & troubleshooting
+
+- [`docs/FAQ.md`](docs/FAQ.md) — licensing, support, production-readiness
+- [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) — real issues, with the fix
 
 ## License
 
