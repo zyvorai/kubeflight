@@ -12,7 +12,7 @@ license = {text = "Apache-2.0"}
 authors = [{name = "Zyvor AI Labs"}]
 dependencies = [
   "fastapi==0.141.1",
-  "uvicorn==0.52.4",
+  "uvicorn==0.53.0",
   "PyYAML==6.0.3",
 ]
 
