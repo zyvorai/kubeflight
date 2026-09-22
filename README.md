@@ -1,12 +1,41 @@
 # KubeFlight
 
+[![CI](https://github.com/zyvorai/kubeflight/actions/workflows/ci.yml/badge.svg)](https://github.com/zyvorai/kubeflight/actions/workflows/ci.yml)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-0.2.0-informational)](CHANGELOG.md)
+[![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
+
+![KubeFlight — Kubernetes preflight simulator](docs/social/kubeflight-share-card.png)
+
 **Know what may break before you deploy.**
 
-KubeFlight is an Apache-2.0, local-first Kubernetes deployment simulator and preflight engine from Zyvor AI Labs. It analyzes rendered manifests, optionally compares them with a baseline and a target-cluster snapshot, simulates placement, evaluates security/RBAC/network policy, estimates change cost, and returns an evidence-backed safety decision.
+📖 **[Read the docs](docs/ARCHITECTURE.md)** — architecture, threat model, deployment, and FAQ.
 
-![KubeFlight dashboard](docs/dashboard.png)
+KubeFlight is an Apache-2.0, local-first Kubernetes deployment simulator and preflight engine from Zyvor AI Labs. It analyzes rendered manifests, optionally compares them with a baseline and cluster snapshot, simulates placement, evaluates security/RBAC/network policy, estimates change cost, and returns an evidence-backed safety decision.
 
 > KubeFlight is intentionally deterministic. It does not use an LLM to decide whether a deployment is safe.
+
+## Contents
+
+- [Why it exists](#why-it-exists)
+- [Is this for you?](#is-this-for-you)
+- [v0.2.0 capabilities](#v020-capabilities)
+- [Quick start](#quick-start)
+- [Dashboard](#dashboard)
+- [Remote deploy](#remote-deploy)
+- [Docker](#docker)
+- [Kubernetes](#kubernetes)
+- [Offline cluster snapshot](#offline-cluster-snapshot)
+- [RBAC contracts](#rbac-contracts)
+- [GitHub Action](#github-action)
+- [Cost model](#cost-model)
+- [API security](#api-security)
+- [Development and release checks](#development-and-release-checks)
+- [Project layout](#project-layout)
+- [Design principles](#design-principles)
+- [Security](#security)
+- [FAQ & troubleshooting](#faq-troubleshooting)
+- [License](#license)
 
 ## Why it exists
 
