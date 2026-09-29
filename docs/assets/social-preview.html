@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>KubeFlight social preview</title>
+<style>
+:root { --ink:#1d1d1f; --soft:#6e6e73; --signal:#0071e3; --signal2:#2997ff; --deep:#0071e3; --warm:#ffffff; --hair:#d2d2d7; --accent-orange:#f97316;
+  --sans:'Helvetica Neue',Helvetica,Arial,sans-serif; --mono:'SF Mono',Menlo,Consolas,monospace; }
+* { box-sizing:border-box; }
+html,body { margin:0; padding:0; }
+body { width:1568px; height:784px; overflow:hidden; background:var(--warm); color:var(--ink); font-family:var(--sans); position:relative; }
+.bar { position:absolute; left:0; top:0; bottom:0; width:16px; background:linear-gradient(180deg,var(--signal),var(--signal2)); }
+.wrap { position:absolute; left:72px; right:62px; top:52px; bottom:46px; display:flex; flex-direction:column; }
+.top { display:flex; align-items:center; gap:15px; font-family:var(--mono); font-size:23px; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); }
+.top img { height:46px; }
+.top b { color:var(--deep); letter-spacing:.1em; }
+.top .r { margin-left:auto; letter-spacing:.08em; }
+.top .dot { display:inline-block; width:12px; height:12px; border-radius:50%; background:var(--accent-orange); margin-left:5px; }
+
+.body { display:flex; flex:1; min-height:0; margin-top:36px; gap:39px; }
+.left { display:flex; flex-direction:column; width:730px; flex:none; }
+h1 { margin:0; font-size:62px; line-height:1.08; letter-spacing:-.025em; font-weight:700; }
+h1 em { font-style:normal; color:var(--signal); }
+.sub { margin:20px 0 0; font-size:27px; line-height:1.45; color:var(--soft); }
+.chips { margin-top:auto; display:flex; flex-wrap:wrap; gap:13px; padding-bottom:6px; }
+.chip { font-size:22px; font-weight:700; padding:8px 17px; border-radius:24px; background:linear-gradient(135deg,var(--signal),var(--signal2)); color:#fff; border:2px solid transparent; }
+.chip.g { background:#f5f5f7; color:var(--deep); border:2px solid var(--hair); }
+
+.right { flex:1; display:flex; align-items:center; justify-content:center; }
+.diagram { position:relative; width:600px; height:440px; }
+.dcap { position:absolute; top:0; left:0; right:0; text-align:center; font-family:var(--mono); font-size:17px; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); }
+.dbox { position:absolute; border:2.5px solid var(--hair); border-radius:16px; background:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.dbox b { font-size:24px; font-weight:700; color:var(--ink); }
+.dbox span { font-size:15px; font-weight:600; letter-spacing:.07em; text-transform:uppercase; color:var(--soft); margin-top:4px; }
+.manifest { top:34px; left:50%; width:260px; height:72px; transform:translateX(-50%); border-color:var(--signal); }
+.manifest b { color:var(--deep); }
+.vline { position:absolute; background:var(--hair); }
+.v-top { top:106px; left:50%; width:3px; height:34px; transform:translateX(-1.5px); }
+.h1line { position:absolute; top:140px; left:10px; right:10px; height:3px; background:var(--hair); }
+.v1-l { top:140px; left:10px; width:3px; height:34px; background:var(--hair); }
+.v1-m { top:140px; left:50%; width:3px; height:34px; background:var(--hair); transform:translateX(-1.5px); }
+.v1-r { top:140px; right:10px; width:3px; height:34px; background:var(--hair); }
+.row3 { position:absolute; top:174px; left:0; right:0; display:flex; justify-content:space-between; }
+.row3 .dbox { position:static; width:180px; height:82px; }
+.v2-l { top:256px; left:10px; width:3px; height:34px; background:var(--hair); }
+.v2-m { top:256px; left:50%; width:3px; height:34px; background:var(--hair); transform:translateX(-1.5px); }
+.v2-r { top:256px; right:10px; width:3px; height:34px; background:var(--hair); }
+.h2line { position:absolute; top:290px; left:10px; right:10px; height:3px; background:var(--hair); }
+.v-bottom { top:290px; left:50%; width:3px; height:34px; transform:translateX(-1.5px); }
+.decision { top:324px; left:50%; width:360px; height:90px; transform:translateX(-50%); background:linear-gradient(180deg,var(--signal),var(--signal2)); border-color:var(--signal); }
+.decision b, .decision span { color:#fff; }
+
+.foot { padding-top:18px; border-top:3.5px solid var(--hair); display:flex; align-items:center; font-family:var(--mono); font-size:26px; color:var(--soft); }
+.foot b { color:var(--ink); }
+.foot .r { margin-left:auto; }
+</style>
+</head>
+<body>
+<div class="bar"></div>
+<div class="wrap">
+  <div class="top"><img src="../social/zyvor-mark.svg" alt=""><b>Zyvor</b><span>&middot;</span><span>KubeFlight</span><span class="r">K8s preflight<span class="dot" aria-hidden="true"></span></span></div>
+  <div class="body">
+    <div class="left">
+      <h1>Know what may break<br><em>before</em> you deploy.</h1>
+      <p class="sub">Deterministic placement, RBAC, NetworkPolicy, cost delta and evidence-backed SAFE decisions — no LLM gate. Apache-2.0.</p>
+      <div class="chips">
+        <span class="chip">Placement sim</span>
+        <span class="chip">Helm/Kustomize</span>
+        <span class="chip g">SARIF reports</span>
+        <span class="chip g">GitHub Action</span>
+      </div>
+    </div>
+    <div class="right">
+      <div class="diagram">
+        <div class="dcap">Checks feed one decision</div>
+        <div class="dbox manifest"><b>Manifest</b><span>raw · helm · kustomize</span></div>
+        <div class="vline v-top"></div>
+        <div class="h1line"></div>
+        <div class="vline v1-l"></div><div class="vline v1-m"></div><div class="vline v1-r"></div>
+        <div class="row3">
+          <div class="dbox"><b>Placement</b><span>scheduler sim</span></div>
+          <div class="dbox"><b>RBAC + Net</b><span>policy eval</span></div>
+          <div class="dbox"><b>Cost &Delta;</b><span>vs baseline</span></div>
+        </div>
+        <div class="vline v2-l"></div><div class="vline v2-m"></div><div class="vline v2-r"></div>
+        <div class="h2line"></div>
+        <div class="vline v-bottom"></div>
+        <div class="dbox decision"><b>Decision</b><span>SAFE &middot; REVIEW &middot; BLOCK</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="foot"><span><b>github.com/zyvorai/kubeflight</b></span><span class="r">v0.2.0 &middot; Apache-2.0</span></div>
+</div>
+</body>
+</html>
