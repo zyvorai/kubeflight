@@ -1,7 +1,7 @@
 # KubeFlight
 
 [![CI](https://github.com/zyvorai/kubeflight/actions/workflows/ci.yml/badge.svg)](https://github.com/zyvorai/kubeflight/actions/workflows/ci.yml)
-[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache%202.0-0071e3?style=flat-square&labelColor=1d1d1f)](LICENSE)
 [![Version](https://img.shields.io/badge/version-0.2.0-informational)](CHANGELOG.md)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
 
@@ -9,43 +9,17 @@
 
 **Know what may break before you deploy.**
 
-📖 **[Read the docs](docs/ARCHITECTURE.md)** — architecture, threat model, deployment, and FAQ.
-
-KubeFlight is an Apache-2.0, local-first Kubernetes deployment simulator and preflight engine from Zyvor AI Labs. It analyzes rendered manifests, optionally compares them with a baseline and cluster snapshot, simulates placement, evaluates security/RBAC/network policy, estimates change cost, and returns an evidence-backed safety decision.
-
 > KubeFlight is intentionally deterministic. It does not use an LLM to decide whether a deployment is safe.
 
-## Contents
+[**Docs site**](https://zyvorai.github.io/kubeflight/) · [**Is this for you?**](#is-this-for-you) · [**v0.2.0 capabilities**](#v020-capabilities) · [**Quick start**](#quick-start) · [**License**](#license)
 
-- [Why it exists](#why-it-exists)
-- [Is this for you?](#is-this-for-you)
-- [v0.2.0 capabilities](#v020-capabilities)
-- [Quick start](#quick-start)
-- [Dashboard](#dashboard)
-- [Remote deploy](#remote-deploy)
-- [Docker](#docker)
-- [Kubernetes](#kubernetes)
-- [Offline cluster snapshot](#offline-cluster-snapshot)
-- [RBAC contracts](#rbac-contracts)
-- [GitHub Action](#github-action)
-- [Cost model](#cost-model)
-- [API security](#api-security)
-- [Development and release checks](#development-and-release-checks)
-- [Project layout](#project-layout)
-- [Design principles](#design-principles)
-- [Security](#security)
-- [FAQ & troubleshooting](#faq-troubleshooting)
-- [License](#license)
-
-## Why it exists
+KubeFlight is an Apache-2.0, local-first Kubernetes deployment simulator and preflight engine from Zyvor AI Labs. It analyzes rendered manifests, optionally compares them with a baseline and cluster snapshot, simulates placement, evaluates security/RBAC/network policy, estimates change cost, and returns an evidence-backed safety decision.
 
 A valid manifest can still fail in production because of node capacity, existing Pods, taints, affinity, NetworkPolicy, missing RBAC, removed APIs, cost growth, availability constraints, or downstream dependencies. KubeFlight puts those signals into one repeatable preflight.
 
 ## Is this for you?
 
-KubeFlight is a small, open-source (Apache-2.0), local-first, deterministic
-preflight simulator — it's not a cost-monitoring dashboard, not a
-general-purpose policy engine, and not an AI-assisted deployment advisor.
+KubeFlight is a small, open-source (Apache-2.0), local-first, deterministic preflight simulator — it's not a cost-monitoring dashboard, not a general-purpose policy engine, and not an AI-assisted deployment advisor.
 
 | | **KubeFlight** | Datree / Fairwinds Insights | Polaris / kube-score | OPA/Conftest, Kyverno | k8sgpt | `kubectl diff --dry-run=server` |
 |---|---|---|---|---|---|---|
@@ -53,50 +27,39 @@ general-purpose policy engine, and not an AI-assisted deployment advisor.
 | Decision method | Deterministic — "does not use an LLM to decide whether a deployment is safe" | Deterministic rules | Deterministic rules | Deterministic rules you author | LLM-based (probabilistic) | N/A (raw diff) |
 | Placement/scheduling simulation | Yes, against an offline or live cluster snapshot | No | No | No | No | No |
 | Cost estimation | Yes (provider-neutral) | Some (Fairwinds/Kubecost-adjacent tools) | No | No | No | No |
-| License | Apache-2.0 | Mixed open-core/proprietary | Apache-2.0 | Apache-2.0 | Apache-2.0 |  N/A (built into kubectl) |
+| License | Apache-2.0 | Mixed open-core/proprietary | Apache-2.0 | Apache-2.0 | Apache-2.0 | N/A (built into kubectl) |
 
-*(General characterizations as of writing — verify current features against
-each project's own docs.)*
+*(General characterizations as of writing — verify current features against each project's own docs.)*
 
-**Maturity, stated honestly**: current version is 0.2.0
-(`CHANGELOG.md`). The tool's own README caveat: "KubeFlight is a
-**preflight simulator**, not a byte-for-byte implementation of
-kube-scheduler plugins, admission webhooks, CNI dataplanes, or production
-traffic. Unknown facts are reported conservatively rather than invented."
-For an authoritative check beyond simulation, it explicitly defers to
-`kubectl apply --dry-run=server` as an opt-in feature requiring a real
-cluster.
+**Maturity, stated honestly**: current version is 0.2.0 ([`CHANGELOG.md`](CHANGELOG.md)). KubeFlight is a **preflight simulator**, not a byte-for-byte implementation of kube-scheduler plugins, admission webhooks, CNI dataplanes, or production traffic. Unknown facts are reported conservatively rather than invented. For an authoritative check beyond simulation, it explicitly defers to `kubectl apply --dry-run=server` as an opt-in feature requiring a real cluster.
 
-New here? [`docs/FAQ.md`](docs/FAQ.md) covers licensing, support, and
-production-readiness questions; [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md)
-covers real operational issues with their documented fix.
+Release validation ([`TEST_RESULTS.md`](TEST_RESULTS.md)): 35/35 unit/API/CLI/regression tests pass, a demo preflight scores 84/100 (review required — the demo manifest is intentionally imperfect), and KubeFlight's own Kubernetes deployment self-analyzes at 100/100 with zero high/critical findings.
+
+New here? [`docs/FAQ.md`](docs/FAQ.md) covers licensing, support, and production-readiness questions; [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) covers real operational issues with their documented fix.
 
 ## v0.2.0 capabilities
 
 | Area | Checks |
 | --- | --- |
 | Parsing/rendering | multi-document YAML/JSON, Kubernetes `List`, Helm auto-render, Kustomize auto-render, repo path auto-detection |
-| Schema baseline | object identity, common workload structural checks, selector/template consistency, removed APIs; optional authoritative `kubectl --dry-run=server` |
+| Schema baseline | object identity, structural checks, selector/template consistency, removed APIs; optional authoritative `kubectl --dry-run=server` |
 | Quantities | Kubernetes-style DecimalSI/BinarySI/scientific quantities; invalid quantities fail closed instead of becoming zero |
-| Restricted security | host namespaces, hostPath, privileged, privilege escalation, capabilities, seccomp, non-root/UID 0, SELinux, AppArmor, safe sysctls, Windows HostProcess, probe/lifecycle host fields |
-| Scheduling | existing Pod reservations, every replica, app/init/native-sidecar accounting, RuntimeClass overhead, ephemeral storage, GPU/extended resources, Ready/unschedulable nodes, selectors, taints/tolerations, required node affinity, required pod affinity/anti-affinity, hard topology spread |
+| Restricted security | host namespaces, hostPath, privileged, capabilities, seccomp, non-root/UID 0, SELinux, AppArmor, Windows HostProcess, probe/lifecycle host fields |
+| Scheduling | existing Pod reservations, every replica, app/init/native-sidecar accounting, RuntimeClass overhead, GPU/extended resources, taints/tolerations, required affinity/anti-affinity, hard topology spread |
 | Reliability | requests/limits, readiness/liveness, PDB coverage, image pinning |
-| Network | statically inferred Service dependencies, ingress + egress NetworkPolicy isolation, selectors/matchExpressions, ports/endPort/named ports, namespaces |
+| Network | statically inferred Service dependencies, ingress + egress NetworkPolicy isolation |
 | RBAC | ServiceAccount presence plus explicit API group/resource/subresource/verb/resourceName contracts via annotation |
-| Change impact | baseline/proposed resource diff, baseline + proposed dependency graphs, deletion-aware reverse blast radius |
+| Change impact | baseline/proposed resource diff, dependency graphs, deletion-aware reverse blast radius |
 | Cost | provider-neutral request/storage estimate and baseline delta |
 | Reports | text, JSON, HTML, Markdown/PR summary, SARIF |
-| API/UI | FastAPI REST API, OpenAPI docs, Apple-inspired embedded dashboard, request-size/concurrency/rate guards, optional bearer auth |
+| API/UI | FastAPI REST API, OpenAPI docs, embedded dashboard, request-size/concurrency/rate guards, optional bearer auth |
 | Kubernetes | hardened raw manifests, Kustomize, Helm, opt-in live-cluster RBAC, restricted Pod Security namespace |
-| GitHub | composite Action, SARIF upload support, Helm/Kustomize checks, container build, kind E2E, multi-arch release, SBOM/provenance wiring |
-
-KubeFlight is a **preflight simulator**, not a byte-for-byte implementation of kube-scheduler plugins, admission webhooks, CNI dataplanes, or production traffic. Unknown facts are reported conservatively rather than invented.
+| GitHub | composite Action, SARIF upload, Helm/Kustomize checks, container build, kind E2E, multi-arch release |
 
 ## Quick start
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+python -m venv .venv && source .venv/bin/activate
 pip install -e .
 
 kubeflight check examples/demo/app.yaml \
@@ -105,223 +68,61 @@ kubeflight check examples/demo/app.yaml \
   --fail-on never
 ```
 
-Or let KubeFlight auto-detect a conventional Kubernetes/Helm/Kustomize path:
+Or auto-detect a conventional Kubernetes/Helm/Kustomize path:
 
 ```bash
 kubeflight plan
 ```
 
-Generate reports:
+Reports: `kubeflight check <path> --format json|html|markdown|sarif --output <file>`. Optional authoritative validation: `kubeflight check <path> --server-dry-run` shells out to `kubectl apply --dry-run=server` against a configured cluster.
+
+### Dashboard
 
 ```bash
-kubeflight check deploy/rendered --format json --output report.json --fail-on never
-kubeflight check deploy/rendered --format html --output report.html --fail-on never
-kubeflight check deploy/rendered --format markdown --output summary.md --fail-on never
-kubeflight check deploy/rendered --format sarif --output kubeflight.sarif --fail-on never
+kubeflight serve --host 0.0.0.0 --port 8080   # http://localhost:8080, API docs at /api/docs
 ```
 
-Optional authoritative API-server validation:
+The browser sends manifests only to the KubeFlight instance you opened — no external SaaS or AI call. Do not send Secrets to an untrusted/shared deployment.
 
-```bash
-kubeflight check deploy/rendered --server-dry-run
-```
+### Kubernetes
 
-This shells out to `kubectl apply --dry-run=server`; it requires a configured cluster and is deliberately opt-in.
-
-## Dashboard
-
-```bash
-kubeflight serve --host 0.0.0.0 --port 8080
-```
-
-Open `http://localhost:8080`. API docs are at `/api/docs`.
-
-The browser sends manifests to the KubeFlight instance you opened. KubeFlight itself makes no external SaaS or AI call. Do not send Secrets to an untrusted/shared deployment.
-
-## Remote deploy
-
-Cross-ships source and installs KubeFlight as a systemd service over SSH (same pattern as Kairo/Scout):
-
-```bash
-# Explicit port (CLI flag)
-./scripts/deploy-remote.sh 212.8.248.187 sus --port 27754
-
-# Or via env
-KUBEFLIGHT_PORT=27754 ./scripts/deploy-remote.sh 212.8.248.187 sus
-
-# Omit port → reuse .deploy-last PORT, else pick random 18000–28999
-./scripts/deploy-remote.sh 212.8.248.187 sus
-
-# Smoke (URL, --port, env, or .deploy-last)
-KUBEFLIGHT_URL=http://212.8.248.187:27754 ./scripts/smoke-remote.sh
-./scripts/smoke-remote.sh --port 27754
-
-# Remove
-./scripts/deploy-remote.sh 212.8.248.187 sus --uninstall
-```
-
-## Docker
-
-```bash
-docker build -t kubeflight:local .
-docker run --rm -p 8080:8080 --read-only --cap-drop ALL kubeflight:local
-```
-
-## Kubernetes
-
-Default mode has **no service-account token** and no cluster-wide RBAC:
+Default mode mounts **no service-account token** and grants no cluster-wide RBAC:
 
 ```bash
 kubectl apply -k deploy/kubernetes
 kubectl -n kubeflight rollout status deployment/kubeflight
-kubectl -n kubeflight port-forward service/kubeflight 8080:80
 ```
 
-The namespace pins Pod Security Admission to `restricted:v1.37` and the container runs non-root, drops all Linux capabilities, uses `RuntimeDefault` seccomp and a read-only root filesystem.
+Helm: `helm upgrade --install kubeflight charts/kubeflight --namespace kubeflight --create-namespace`. Docker: `docker run --rm -p 8080:8080 --read-only --cap-drop ALL kubeflight:local`. Both default to the same no-token, no-cluster-wide-RBAC posture; exposure and Pod Security details are in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ### Opt-in live-cluster snapshot mode
-
-Live mode is intentionally separate because it lets KubeFlight read cluster metadata. Create an API token Secret first:
 
 ```bash
 kubectl -n kubeflight create secret generic kubeflight-api \
   --from-literal=token='replace-with-a-long-random-token'
-
 kubectl apply -k deploy/kubernetes/live-cluster
 ```
 
-The live overlay grants read-only `get/list` for Nodes, Namespaces, Pods, ServiceAccounts, StorageClasses and RuntimeClasses. It does **not** grant Secrets, logs, exec, mutation, or workload write permissions. Clients must authenticate to `/api/check` with `Authorization: Bearer <token>` when live mode is enabled.
+Grants read-only `get/list` for Nodes, Namespaces, Pods, ServiceAccounts, StorageClasses and RuntimeClasses only — never Secrets, logs, exec, or writes. Clients authenticate to `/api/check` with `Authorization: Bearer <token>`.
 
-### Helm
+### Remote deploy
 
-Default/offline mode:
-
-```bash
-helm upgrade --install kubeflight charts/kubeflight \
-  --namespace kubeflight --create-namespace
-```
-
-Live mode:
+Cross-ships source and installs KubeFlight as a systemd service over SSH:
 
 ```bash
-kubectl -n kubeflight create secret generic kubeflight-api --from-literal=token='...'
-helm upgrade --install kubeflight charts/kubeflight -n kubeflight \
-  --set liveCluster.enabled=true \
-  --set liveCluster.existingSecret=kubeflight-api
+./scripts/deploy-remote.sh <host> <user> --port 27754   # or KUBEFLIGHT_PORT=27754, or omit to reuse .deploy-last
+./scripts/smoke-remote.sh --port 27754                  # or KUBEFLIGHT_URL=...
+./scripts/deploy-remote.sh <host> <user> --uninstall     # remove
 ```
 
-## Offline cluster snapshot
+## What ships
 
-The scheduler accepts a JSON snapshot containing standard Kubernetes objects:
-
-```json
-{
-  "nodes": [],
-  "pods": [],
-  "namespaces": [],
-  "serviceaccounts": [],
-  "storageclasses": [],
-  "runtimeclasses": []
-}
-```
-
-Existing non-terminal Pods with `spec.nodeName` are deducted from node allocatable resources before proposed replicas are placed.
-
-## RBAC contracts
-
-Legacy compact syntax remains supported:
-
-```yaml
-metadata:
-  annotations:
-    kubeflight.io/requires-rbac: "secrets:get,leases:update"
-```
-
-For precise checks, use a YAML list inside the annotation:
-
-```yaml
-metadata:
-  annotations:
-    kubeflight.io/requires-rbac: |
-      - apiGroup: ""
-        resource: secrets
-        verbs: [get]
-        resourceNames: [payments-db]
-      - apiGroup: coordination.k8s.io
-        resource: leases
-        verbs: [get, create, update]
-```
-
-KubeFlight evaluates submitted Roles, ClusterRoles, RoleBindings and ClusterRoleBindings.
-
-## GitHub Action
-
-```yaml
-name: KubeFlight
-on: [pull_request]
-permissions:
-  contents: read
-  security-events: write
-jobs:
-  preflight:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: zyvorai/kubeflight@v0.2.0
-      with:
-        path: deploy/rendered
-        baseline: deploy/baseline
-        fail-on: high
-    - uses: github/codeql-action/upload-sarif@v3
-      if: always()
-      with:
-        sarif_file: kubeflight.sarif
-```
-
-The action also appends a human-readable Markdown summary to the GitHub Actions step summary.
-
-Exit codes:
-
-- `0`: analysis completed and configured severity threshold was not crossed
-- `2`: input/parser/snapshot error
-- `3`: finding threshold crossed
-- `4`: optional server-side dry-run could not complete
-
-## Cost model
-
-Defaults are normalized reference rates, not a cloud bill forecast:
-
-```bash
-export KUBEFLIGHT_COST_CPU_MONTH=14.60
-export KUBEFLIGHT_COST_GIB_MONTH=1.90
-export KUBEFLIGHT_COST_GIB_STORAGE_MONTH=0.08
-export KUBEFLIGHT_COST_GPU_MONTH=510
-```
-
-Calibrate these values to your provider/on-premises accounting before using cost gates.
-
-## API security
-
-Useful server environment variables:
-
-```text
-KUBEFLIGHT_API_TOKEN              optional bearer authentication
-KUBEFLIGHT_LIVE_CLUSTER=false     live cluster reads are disabled by default
-KUBEFLIGHT_MAX_BODY_BYTES=4194304
-KUBEFLIGHT_MAX_CONCURRENT=8
-KUBEFLIGHT_RATE_PER_MINUTE=60
-```
-
-Live-cluster requests require both `KUBEFLIGHT_LIVE_CLUSTER=true` and `KUBEFLIGHT_API_TOKEN`.
-
-## Development and release checks
-
-```bash
-pip install -r requirements-dev.txt
-./scripts/release_check.sh
-```
-
-The local release check runs compile, tests, API smoke, Kubernetes self-analysis, YAML metadata validation, wheel build, and clean installed-package smoke. CI adds Helm, Kustomize, Docker and kind checks because those binaries are not guaranteed to exist on developer machines.
+- **RBAC contracts** — annotate a manifest (`kubeflight.io/requires-rbac: |` with a YAML list of `apiGroup`/`resource`/`verbs`/`resourceNames`) and KubeFlight evaluates it against submitted Roles/ClusterRoles/RoleBindings/ClusterRoleBindings.
+- **GitHub Action** — `uses: zyvorai/kubeflight@v0.2.0` with `path`/`baseline`/`fail-on` inputs, a JSON/SARIF/Markdown output triple, and a step-summary write; exit codes `0` (pass), `2` (input error), `3` (threshold crossed), `4` (dry-run failed).
+- **Cost model** — normalized reference rates you calibrate (`KUBEFLIGHT_COST_CPU_MONTH`, `_GIB_MONTH`, `_GIB_STORAGE_MONTH`, `_GPU_MONTH`), not a cloud bill forecast.
+- **API security** — `KUBEFLIGHT_API_TOKEN`, `KUBEFLIGHT_LIVE_CLUSTER` (default `false`), body/concurrency/rate-limit guards (`KUBEFLIGHT_MAX_BODY_BYTES`, `_MAX_CONCURRENT`, `_RATE_PER_MINUTE`); live-cluster requests require both a token and the flag.
+- **Offline cluster snapshot** — a JSON document of `nodes`/`pods`/`namespaces`/`serviceaccounts`/`storageclasses`/`runtimeclasses`; existing non-terminal Pods are deducted from allocatable resources before proposed replicas are placed.
+- **Release checks** — `./scripts/release_check.sh` runs compile, tests, API smoke, Kubernetes self-analysis, YAML validation, and wheel build/install smoke locally; CI adds Helm, Kustomize, Docker and kind checks.
 
 ## Project layout
 
@@ -338,34 +139,34 @@ kubeflight/
 └── .github/workflows/      # CI, kind E2E, release/SBOM/provenance
 ```
 
-## Design principles
+**Design principles**: deterministic first · evidence and remediation with every finding · local-first, no SaaS dependency · no cluster credentials in the default deployment · unknown is not the same as safe or blocked · server dry-run/admission remains authoritative when enabled · simulation limitations are part of the output contract.
 
-1. Deterministic first.
-2. Evidence and remediation with every finding.
-3. Local-first; no SaaS dependency.
-4. No cluster credentials in the default deployment.
-5. Unknown is not the same as safe or blocked.
-6. Server dry-run/admission remains authoritative when enabled.
-7. Simulation limitations are part of the output contract.
+## Docs map
+
+| Topic | Doc |
+| --- | --- |
+| Architecture, pipeline stages, trust boundaries | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
+| Severities and what triggers each | [`docs/RULES.md`](docs/RULES.md) |
+| Deployment modes, exposure, Pod Security | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) |
+| Assets, defaults, non-goals | [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) |
+| Licensing, support, production-readiness | [`docs/FAQ.md`](docs/FAQ.md) |
+| Real issues with their documented fix | [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) |
+| Rendered documentation site | <https://zyvorai.github.io/kubeflight/> |
 
 ## Security
 
-See [SECURITY.md](SECURITY.md) and [docs/THREAT_MODEL.md](docs/THREAT_MODEL.md).
+See [`SECURITY.md`](SECURITY.md) and [`docs/THREAT_MODEL.md`](docs/THREAT_MODEL.md) for the asset/trust model and vulnerability reporting.
 
-## FAQ & troubleshooting
+## Contributing
 
-- [`docs/FAQ.md`](docs/FAQ.md) — licensing, support, production-readiness
-- [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) — real issues, with the fix
+Build/test commands and PR expectations are in [`CONTRIBUTING.md`](CONTRIBUTING.md); community conduct in [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Release history: [`CHANGELOG.md`](CHANGELOG.md).
 
 ## License
 
 ### Open source (Apache-2.0)
 
-This repository is licensed under the [Apache License, Version 2.0](LICENSE).
-You may use, modify, and run it for personal, lab, and commercial production
-use at no charge, subject to Apache-2.0 (preserve notices / NOTICE where required).
+This repository is licensed under the [Apache License, Version 2.0](LICENSE). You may use, modify, and run it for personal, lab, and commercial production use at no charge, subject to Apache-2.0 (preserve notices / NOTICE where required).
 
 ### Enterprise
 
-Production support, SLAs, and Zyvor Enterprise products are licensed separately.
-Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) or see [zyvor.dev](https://zyvor.dev).
+Production support, SLAs, and Zyvor Enterprise products are licensed separately. Contact [sales@zyvor.dev](mailto:sales@zyvor.dev) or see [zyvor.dev](https://zyvor.dev).
