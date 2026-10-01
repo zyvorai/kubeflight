@@ -172,6 +172,8 @@ Build/test commands and PR expectations are in [`CONTRIBUTING.md`](CONTRIBUTING.
 
 ## License
 
+Commercial subscriptions and support: see [docs/SUBSCRIPTION-MODEL.md](docs/SUBSCRIPTION-MODEL.md).
+
 ### Open source (Apache-2.0)
 
 This repository is licensed under the [Apache License, Version 2.0](LICENSE). You may use, modify, and run it for personal, lab, and commercial production use at no charge, subject to Apache-2.0 (preserve notices / NOTICE where required).
